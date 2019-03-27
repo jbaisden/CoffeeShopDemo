@@ -11,15 +11,19 @@ export class OrderListComponent implements OnInit {
   constructor(private ordersService: OrdersService) { }
   coffeeOrders;
 
-  getCoffeeOrders = () =>
-    this.ordersService
+  getCoffeeOrders = () => {
+    return this.ordersService
       .getCoffeeOrders()
       .subscribe(res => (this.coffeeOrders = res));
+  };
 
-  markCompleted = data =>
-    this.ordersService.updateCoffeeOrder(data);
+  markCompleted = data => {
+    return this.ordersService.updateCoffeeOrder(data);
+  };
 
-  deleteOrder = data => this.ordersService.deleteCoffeeOrder(data);
+  deleteOrder = data => {
+    return this.ordersService.deleteCoffeeOrder(data);
+  };
 
   ngOnInit() {
     this.getCoffeeOrders();
