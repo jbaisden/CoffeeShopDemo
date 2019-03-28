@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OrdersService } from '../shared/orders.service';
+import { FormGroup, FormControl } from '@angular/forms';
+import { CoffeeOrder } from '../shared/order.model';
 
 @Component({
   selector: 'app-orders',
@@ -10,12 +12,21 @@ export class OrdersComponent implements OnInit {
 
   constructor(private ordersService: OrdersService) { }
 
+  form = new FormGroup({
+    customerName: new FormControl(''),
+    orderNumber: new FormControl(''),
+    coffeeOrder: new FormControl(''),
+    completed: new FormControl(false)
+  })
+
   coffees = ["Americano", "Flat White", "Cappuccino",
     "Latte", "Espresso", "Machiato", "Mocha", "Hot Chocolate", "Tea"];
 
   coffeeOrder = [];
 
-  addCoffee = coffee => this.coffeeOrder.push(coffee);
+  addCoffee = coffee => {
+    return this.coffeeOrder.push(coffee);
+  };
 
   removeCoffee = coffee => {
     let index = this.coffeeOrder.indexOf(coffee);
@@ -24,14 +35,18 @@ export class OrdersComponent implements OnInit {
 
   onSubmit() {
 
-    this.ordersService.form.value.coffeeOrder = this.coffeeOrder;
-    let data = this.ordersService.form.value;
+    let order: CoffeeOrder;
+    order = this.form.value;
+    order.coffeeOrder = this.coffeeOrder;
 
-    this.ordersService.createCoffeeOrder(data)
+    this.ordersService.createCoffeeOrder(order)
       .then(res => {
-        /*do something here....
-        maybe clear the form or give a success message*/
+
       });
+
+    this.coffeeOrder = [];
+    this.form.reset();
+
   }
 
   ngOnInit() {

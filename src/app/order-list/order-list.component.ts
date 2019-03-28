@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OrdersService } from '../shared/orders.service';
+import { CoffeeOrder } from '../shared/order.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-order-list',
@@ -9,24 +11,18 @@ import { OrdersService } from '../shared/orders.service';
 export class OrderListComponent implements OnInit {
 
   constructor(private ordersService: OrdersService) { }
-  coffeeOrders;
+  coffeeOrders: Observable<CoffeeOrder[]>;
 
-  getCoffeeOrders = () => {
-    return this.ordersService
-      .getCoffeeOrders()
-      .subscribe(res => (this.coffeeOrders = res));
-  };
-
-  markCompleted = data => {
+  markCompleted = (data: CoffeeOrder) => {
     return this.ordersService.updateCoffeeOrder(data);
   };
 
-  deleteOrder = data => {
-    return this.ordersService.deleteCoffeeOrder(data);
+  deleteOrder = (data: CoffeeOrder) => {
+    this.ordersService.deleteCoffeeOrder(data);
   };
 
   ngOnInit() {
-    this.getCoffeeOrders();
+    this.coffeeOrders = this.ordersService.getCoffeeOrders();
   }
 
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { CoffeeOrder } from './order.model';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,14 +11,7 @@ export class OrdersService {
 
   constructor(private firestore: AngularFirestore) { }
 
-  form = new FormGroup({
-    customerName: new FormControl(''),
-    orderNumber: new FormControl(''),
-    coffeeOrder: new FormControl(''),
-    completed: new FormControl(false)
-  })
-
-  createCoffeeOrder(data) {
+  createCoffeeOrder(data: CoffeeOrder) {
     return new Promise<any>((resolve, reject) => {
       this.firestore
         .collection("coffeeOrders")
@@ -25,22 +20,34 @@ export class OrdersService {
     });
   }
 
-  updateCoffeeOrder(data) {
+  updateCoffeeOrder(data: CoffeeOrder) {
     return this.firestore
       .collection("coffeeOrders")
-      .doc(data.payload.doc.id)
+      .doc(data.id)
       .set({ completed: true }, { merge: true });
   }
 
-  deleteCoffeeOrder(data) {
+  deleteCoffeeOrder(data: CoffeeOrder) {
     return this.firestore
       .collection("coffeeOrders")
-      .doc(data.payload.doc.id)
+      .doc(data.id)
       .delete();
   }
 
-  getCoffeeOrders() {
-    return this.firestore.collection("coffeeOrders").snapshotChanges();
+  getCoffeeOrders(): Observable<any> | Observable<CoffeeOrder[]> {
+    return this.firestore.collection<CoffeeOrder>("coffeeOrders")
+      .snapshotChanges()
+      .pipe(
+        map(docChangeActions => {
+          return docChangeActions.map(coffeeOrderDoc => {
+            let data = coffeeOrderDoc.payload.doc.data();
+            let id = coffeeOrderDoc.payload.doc.id;
+            console.warn({ id, ...data } as CoffeeOrder);
+            return { id, ...data } as CoffeeOrder;
+          })
+        })
+      );
+
   }
 
 
